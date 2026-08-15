@@ -69,6 +69,9 @@ jobs:
             [ -f "$path" ] || continue
             echo " $(sha256sum "$path" | cut -d' ' -f1) $(stat -c %s "$path") ${path}" >> Release
           done
+- name: 同步 Release 到仓库根目录 (让 GitHub Pages 根 URL 返回 200，避免 Sileo 在 404 时直接拒绝)
+  run: |
+ cp dists/stable/Release index.html
 
       - name: 提交自动生成的更改
         run: |
