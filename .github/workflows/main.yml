@@ -32,13 +32,14 @@ jobs:
           mkdir -p "${DEST}"
           dpkg-scanpackages -m pool /dev/null > "${DEST}/Packages"
           gzip  -9c -n "${DEST}/Packages" > "${DEST}/Packages.gz"
-          bzip2 -9c -n "${DEST}/Packages" > "${DEST}/Packages.bz2"
-          xz     -9c -n "${DEST}/Packages" > "${DEST}/Packages.xz"
-          zstd  -q -k -19 --no-progress "${DEST}/Packages" -o "${DEST}/Packages.zst"
+          bzip2 -9c "${DEST}/Packages" > "${DEST}/Packages.bz2"
+          xz    -9c "${DEST}/Packages" > "${DEST}/Packages.xz"
+          zstd  -q -19 --no-progress "${DEST}/Packages" -o "${DEST}/Packages.zst"
 
       - name: 生成 Release 文件
         working-directory: dists/stable
         run: |
+          SUITE=stable
           COMP=main
           ARCH=iphoneos-arm64
           DIR="${COMP}/binary-${ARCH}"
@@ -46,7 +47,7 @@ jobs:
           {
             echo "Origin: Mingzi Repo"
             echo "Label: Mingzi Repo"
-            echo "Suite: stable"
+            echo "Suite: ${SUITE}"
             echo "Version: 1.0"
             echo "Codename: ios"
             echo "Architectures: iphoneos-arm iphoneos-arm64"
