@@ -34,7 +34,7 @@ jobs:
           gzip  -9c -n "${DEST}/Packages" > "${DEST}/Packages.gz"
           bzip2 -9c "${DEST}/Packages" > "${DEST}/Packages.bz2"
           xz    -9c "${DEST}/Packages" > "${DEST}/Packages.xz"
-          zstd  -q -19 --no-progress "${DEST}/Packages" -o "${DEST}/Packages.zst"
+          zstd  -q -19 -c "${DEST}/Packages" > "${DEST}/Packages.zst"
 
       - name: 生成 Release 文件
         working-directory: dists/stable
