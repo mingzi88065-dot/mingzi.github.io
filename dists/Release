@@ -1,0 +1,21 @@
+Origin: Mingzi Repo
+Label: Mingzi Repo
+Suite: stable
+Version: 1.0
+Codename: ios
+Architectures: iphoneos-arm iphoneos-arm64
+Components: main
+Description: rooless专用源
+Date: Sat, 15 Aug 2026 10:37:56 +0000
+MD5Sum:
+ e97e33e99bd6a0ffba7b64a0524c3467 45089 Packages
+ 040c3cfb73f58a8b0c0cb646a6a8fed3 14347 Packages.bz2
+ 018e5d3355d65e61bf1f627379477183 16165 Packages.gz
+ b88c0ea8a2dcc4d07fd87c834acc4375 14296 Packages.xz
+ 2f3d8029686c632d02a1453655357a9c 16644 Packages.zst
+SHA256:
+ 4ea294a7aa99c19c27647721ae38a2ba14d2c13faf2c327a4c736fc554aa55f5 45089 Packages
+ 2fe85e701cfbd47ac1fc205be98079373403663ef11bddbbe609cc7e19a46ab0 14347 Packages.bz2
+ 474132fea1e26952b3b1d13df8a086dee96887f17b802109ad6b93e462a344bd 16165 Packages.gz
+ e416d1a5ace0c16777844e31738ab9bff1b6306d0aac8d91b4e652ecc3424d71 14296 Packages.xz
+ 33a6b469dd0e21fcb891c5d6440492bfad4e11fcb1e49b03ff8e4ae4690a0bfb 16644 Packages.zst
