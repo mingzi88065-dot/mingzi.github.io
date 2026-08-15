@@ -50,7 +50,7 @@ jobs:
             echo "Suite: ${SUITE}"
             echo "Version: 1.0"
             echo "Codename: ios"
-            echo "Architectures: iphoneos-arm iphoneos-arm64"
+            echo "Architectures: iphoneos-arm64"
             echo "Components: ${COMP}"
             echo "Description: rooless专用源"
             echo "Date: $(date -R)"
