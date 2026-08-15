@@ -1,0 +1,66 @@
+name: 自动更新越狱源
+
+on:
+  push:
+    paths:
+      - 'pool/**'
+  workflow_dispatch:
+
+jobs:
+  update-repo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 设置环境
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev gnupg
+          mkdir -p dists
+
+      - name: 生成 Packages 文件
+        run: |
+          dpkg-scanpackages pool /dev/null > dists/Packages
+          bzip2 -c dists/Packages > dists/Packages.bz2
+          gzip -c dists/Packages > dists/Packages.gz
+          xz -c dists/Packages > dists/Packages.xz
+          zstd -c dists/Packages > dists/Packages.zst
+
+      - name: 生成 Release 文件
+        run: |
+          cd dists
+          echo "Origin: Mingzi Repo" > Release
+          echo "Label: Mingzi Repo" >> Release
+          echo "Suite: stable" >> Release
+          echo "Version: 1.0" >> Release
+          echo "Codename: ios" >> Release
+          echo "Architectures: iphoneos-arm iphoneos-arm64" >> Release
+          echo "Components: main" >> Release
+          echo "Description: rooless专用源" >> Release
+          echo "Date: $(date -R)" >> Release
+          echo "MD5Sum:" >> Release
+          for f in Packages Packages.bz2 Packages.gz Packages.xz Packages.zst; do
+            if [ -f "$f" ]; then
+              echo " $(md5sum $f | cut -d' ' -f1) $(stat -c %s $f) $f" >> Release
+            fi
+          done
+          echo "SHA256:" >> Release
+          for f in Packages Packages.bz2 Packages.gz Packages.xz Packages.zst; do
+            if [ -f "$f" ]; then
+              echo " $(sha256sum $f | cut -d' ' -f1) $(stat -c %s $f) $f" >> Release
+            fi
+          done
+
+      - name: 提交自动生成的更改
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dists/
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新源文件"
+          git push
