@@ -23,61 +23,44 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y dpkg-dev xz-utils zstd
 
-      - name: 生成 Packages 文件
+      - name: 生成 Packages 文件（扁平布局，直接放仓库根目录）
         run: |
-          SUITE=stable
-          COMP=main
-          ARCH=iphoneos-arm64
-          DEST="dists/${SUITE}/${COMP}/binary-${ARCH}"
-          mkdir -p "${DEST}"
-          dpkg-scanpackages -m pool /dev/null > "${DEST}/Packages"
-          gzip  -9c -n "${DEST}/Packages" > "${DEST}/Packages.gz"
-          bzip2 -9c "${DEST}/Packages" > "${DEST}/Packages.bz2"
-          xz    -9c "${DEST}/Packages" > "${DEST}/Packages.xz"
-          zstd  -q -19 -c "${DEST}/Packages" > "${DEST}/Packages.zst"
+          dpkg-scanpackages -m pool /dev/null > Packages
+          gzip  -9c -n Packages > Packages.gz
+          bzip2 -9c Packages > Packages.bz2
+          xz    -9c Packages > Packages.xz
+          zstd  -q -19 -c Packages > Packages.zst
 
-      - name: 生成 Release 文件
-        working-directory: dists/stable
+      - name: 生成 Release 文件（根目录）
         run: |
-          SUITE=stable
-          COMP=main
-          ARCH=iphoneos-arm64
-          DIR="${COMP}/binary-${ARCH}"
-
           {
             echo "Origin: Mingzi Repo"
             echo "Label: Mingzi Repo"
-            echo "Suite: ${SUITE}"
+            echo "Suite: stable"
             echo "Version: 1.0"
             echo "Codename: ios"
             echo "Architectures: iphoneos-arm64"
-            echo "Components: ${COMP}"
+            echo "Components: main"
             echo "Description: rooless专用源"
             echo "Date: $(date -R)"
           } > Release
 
           echo "MD5Sum:" >> Release
           for f in Packages Packages.gz Packages.bz2 Packages.xz Packages.zst; do
-            path="${DIR}/${f}"
-            [ -f "$path" ] || continue
-            echo " $(md5sum "$path" | cut -d' ' -f1) $(stat -c %s "$path") ${path}" >> Release
+            [ -f "$f" ] || continue
+            echo " $(md5sum "$f" | cut -d' ' -f1) $(stat -c %s "$f") $f" >> Release
           done
 
           echo "SHA256:" >> Release
           for f in Packages Packages.gz Packages.bz2 Packages.xz Packages.zst; do
-            path="${DIR}/${f}"
-            [ -f "$path" ] || continue
-            echo " $(sha256sum "$path" | cut -d' ' -f1) $(stat -c %s "$path") ${path}" >> Release
+            [ -f "$f" ] || continue
+            echo " $(sha256sum "$f" | cut -d' ' -f1) $(stat -c %s "$f") $f" >> Release
           done
-
-      - name: 同步 Release 到仓库根目录
-        run: |
-          cp dists/stable/Release index.html
 
       - name: 提交自动生成的更改
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add dists/ index.html
-          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新源文件"
+          git add Release Packages Packages.gz Packages.bz2 Packages.xz Packages.zst
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新源文件（扁平布局）"
           git push
